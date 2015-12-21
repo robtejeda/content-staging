@@ -90,10 +90,10 @@ class Post_Taxonomy_DAO extends DAO {
 	protected function do_insert( Model $obj ) {
 		$data   = $this->create_array( $obj );
 		$format = $this->format();
-		//$this->wpdb->insert( $this->get_table(), $data, $format );
+		return $this->wpdb->insert( $this->get_table(), $data, $format );
 
 		return $data;
-		
+
 		// TODO: Why does the above not work?
 		return wp_set_object_terms( $obj->get_post()->get_id(), $obj->get_taxonomy()->get_term()->get_slug(), $obj->get_taxonomy()->get_taxonomy(), true );
 	}
