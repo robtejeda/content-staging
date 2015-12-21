@@ -328,11 +328,13 @@ abstract class Batch_Importer {
 				$is_acf = ( strpos( $meta[$i]['meta_value'], 'original_image' ) !== FALSE ) ? true : false;
 				if ( $is_acf ) {
 					$arr = json_decode( $meta[$i]['meta_value'] );
-					$referenced_post_id = $arr['original_image'];
+					$val = $arr['original_image'];
+				} else {
+					$val = $meta[$i]['meta_value'];
 				}
 
 				// Post ID this meta value is referring to.
-				$referenced_post_id = $this->post_dao->get_id_by_guid( $meta[$i]['meta_value'] );
+				$referenced_post_id = $this->post_dao->get_id_by_guid( $val );
 
 				// Referenced post could not be found.
 				if ( ! $referenced_post_id ) {
