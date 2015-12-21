@@ -211,6 +211,4 @@ register_activation_hook( __FILE__, array( 'Content_Staging', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'Content_Staging', 'deactivate' ) );
 
 // Initialize plugin.
-// HACK: now instead of plugins_loaded
-// add_action( 'plugins_loaded', array( 'Content_Staging', 'init' ) );
-Content_Staging::init();
+add_action( 'plugins_loaded', array( 'Content_Staging', 'init' ) );
