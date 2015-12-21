@@ -254,18 +254,18 @@ abstract class Batch_Importer {
 		// Add post diff to array of post diffs.
 		$this->add_post_diff( $post_diff );
 
-		$this->api->add_deploy_message( $this->batch->get_id(), var_export($post->get_post_taxonomy_relationships(), true), 'error' );
-
+		$relationships = $post->get_post_taxonomy_relationships();
 		// Clear old post/taxonomy relationships.
-		foreach ( $post->get_post_taxonomy_relationships() as $post_taxonomy ) {
+		foreach ( $relationships as $post_taxonomy ) {
 			$this->post_taxonomy_dao->clear_post_taxonomy_relationships( $post_taxonomy );
 		}
 
-		$this->api->add_deploy_message( $this->batch->get_id(), var_export($post->get_post_taxonomy_relationships(), true), 'error' );
-
 		// Import post/taxonomy relationships.
-		foreach ( $post->get_post_taxonomy_relationships() as $post_taxonomy ) {
+		foreach ( $relationships as $post_taxonomy ) {
 			// Import taxonomy.
+
+			$this->api->add_deploy_message( $this->batch->get_id(), var_export($post_taxonomy, true), 'error' );
+
 			$this->import_taxonomy( $post_taxonomy->get_taxonomy() );
 			$this->post_taxonomy_dao->insert( $post_taxonomy );
 		}
