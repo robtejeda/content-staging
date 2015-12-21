@@ -328,7 +328,10 @@ abstract class Batch_Importer {
 				$val = $meta[$i]['meta_value'];
 
 				$is_acf = ( strpos( $val, 'original_image' ) !== FALSE ) ? true : false;
-
+				if ( $is_acf ) {
+					$data = json_decode( $val );
+					$val = $data['original_image'];
+				}
 				$this->api->add_deploy_message( $this->batch->get_id(), $val . ' ' . (($is_acf) ? 'yes' : 'no'), 'warning' );
 
 				// Post ID this meta value is referring to.
