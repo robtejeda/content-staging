@@ -323,44 +323,40 @@ abstract class Batch_Importer {
 			// TODO Remove check for "master"
 			if ( in_array( $meta[$i]['meta_key'], $keys ) && ! empty( $meta[$i]['meta_value'] ) && $meta[$i]['meta_value'] !== 'master' ) {
 
-				// HACK: Maybe not a hack. Support for Advanced Custom Fields cropped images. This assumes the image
-				// ids are the same. TODO ... make this a filterable function?
-				$val = $meta[$i]['meta_value'];
+				// Start of supporting filters here... TODO
+				$meta_value = apply_filters( 'sme_post_relationship_value_deconstruct', [ $meta[$i]['meta_value'] ] );
 
-				$is_acf = ( strpos( $val, 'original_image' ) !== FALSE ) ? true : false;
-				if ( $is_acf ) {
-					$data = json_decode( $val );
-					$val = $data->original_image;
+				for ( $i = 0; $i < count( $meta_value ); $i++ ) {
+					// Post ID this meta value is referring to.
+					$referenced_post_id = $this->post_dao->get_id_by_guid( $val );
+
+					// Referenced post could not be found.
+					if ( ! $referenced_post_id ) {
+
+						$referenced_post_id = 0;
+
+						$message  = 'Failed updating relationship between posts (blog ID %d). The relationship is defined in the postmeta table. ';
+						$message .= '<ul>';
+						$message .= '<li>Stage ID referencing post: %d</li>';
+						$message .= '<li>Production ID referencing post: %d</li>';
+						$message .= '<li>Key holding referenced post: %s</li>';
+						$message .= '<li>GUID referenced post: %s</li>';
+						$message .= '</ul>';
+
+						$message = sprintf( $message, get_current_blog_id(), $stage_id, $prod_id, $meta[$i]['meta_key'], $meta[$i]['meta_value'] );
+
+						$this->api->add_deploy_message( $this->batch->get_id(), $message, 'warning' );
+					}
+
+					// Replace the value in our meta value array
+					$meta_value[$i] = $referenced_post_id;
 				}
-				$this->api->add_deploy_message( $this->batch->get_id(), $val . ' ' . (($is_acf) ? 'yes' : 'no'), 'warning' );
 
-				// Post ID this meta value is referring to.
-				$referenced_post_id = $this->post_dao->get_id_by_guid( $val );
-
-				// Referenced post could not be found.
-				if ( ! $referenced_post_id ) {
-
-					$referenced_post_id = 0;
-
-					$message  = 'Failed updating relationship between posts (blog ID %d). The relationship is defined in the postmeta table. ';
-					$message .= '<ul>';
-					$message .= '<li>Stage ID referencing post: %d</li>';
-					$message .= '<li>Production ID referencing post: %d</li>';
-					$message .= '<li>Key holding referenced post: %s</li>';
-					$message .= '<li>GUID referenced post: %s</li>';
-					$message .= '</ul>';
-
-					$message = sprintf( $message, get_current_blog_id(), $stage_id, $prod_id, $meta[$i]['meta_key'], $meta[$i]['meta_value'] );
-
-					$this->api->add_deploy_message( $this->batch->get_id(), $message, 'warning' );
-				}
+				// Start of supporting filters here... TODO
+				$meta_value = apply_filters( 'sme_post_relationship_value_reconstruct', $meta_value );
 
 				// Update meta value to point at the post ID on production.
-				if ( $is_acf ) {
-					$meta[$i]['meta_value'] = json_encode( ['original_image' => $referenced_post_id, 'cropped_image' => $referenced_post_id] );
-				} else {
-					$meta[$i]['meta_value'] = $referenced_post_id;
-				}
+				$meta[$i]['meta_value'] = $meta_value;
 			}
 		}
 

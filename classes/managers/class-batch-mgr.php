@@ -298,32 +298,26 @@ class Batch_Mgr {
 
 		// Find post the current post holds a reference to.
 
-		// HACK: Check to see if we are dealing with ACF. If so, we need to change the meta value
-		// slightly. Ideally this could be done via a filter but I don't have time.
-		$val = $postmeta['meta_value'];
+		// Start of supporting filters here... TODO
+		$value = apply_filters( 'sme_post_relationship_value_deconstruct', [ $postmeta['meta_value'] ] );
 
-		$is_acf = ( strpos( $val, 'original_image' ) !== FALSE ) ? true : false;
-		if ( $is_acf ) {
-			$data = json_decode( $val );
-			$val = $data->original_image;
-		}
+		for ( $i = 0; $i < count( $value ); $i++ ) {
+			$post = $this->post_dao->find( $value[$i] );
 
-		$post = $this->post_dao->find( $val );
+			if ( isset( $post ) && $post->get_id() !== null ) {
+				$this->add_post( $batch, $post );
 
-		if ( isset( $post ) && $post->get_id() !== null ) {
-			$this->add_post( $batch, $post );
-
-			/*
-			 * Change meta value to post GUID instead of post ID so we can later find
-			 * the reference on production.
-			 */
-			if ( $is_acf ) {
-				$postmeta['meta_value'] = json_encode([ 'original_image' => $post->get_guid(), 'cropped_image' => $post->get_guid() ]);
-			} else {
-				$postmeta['meta_value'] = $post->get_guid();
+				/*
+				 * Change meta value to post GUID instead of post ID so we can later find
+				 * the reference on production.
+				 */
+				$value[$i] = $post->get_guid();
 			}
-			
 		}
+
+		// Start of supporting filters here... TODO
+		$value = apply_filters( 'sme_post_relationship_value_reconstruct', $value );
+		$postmeta['meta_value'] = $value;
 
 		return $postmeta;
 	}
