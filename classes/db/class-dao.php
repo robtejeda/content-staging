@@ -66,10 +66,8 @@ abstract class DAO {
 	}
 
 	public function insert( Model $obj ) {
-		// HACK: Remove this after debug.
-		$result = $this->do_insert( $obj );
+		$this->do_insert( $obj );
 		$this->add_to_map( $obj );
-		return $result;
 	}
 
 	/**
