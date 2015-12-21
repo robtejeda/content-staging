@@ -23,9 +23,30 @@ Activate the plugin on both environments.
 Configuration
 -------------
 
+### Alternative 1 - WP Admin
+
 Go into **Content Staging** > **Settings** to add your staging key (one can be generated from the page) as well as your production site endpoint URL.'
 
-* Important * - Make sure you copy your staging key to your production site.
+**Important** - Make sure you copy your staging key to your production site.
+
+### Alternative 2 - WP Config File
+
+You can override settings done in WP Admin by defining specific constants in your config file (e.g. your wp-config.php file).
+
+Add the following to your config file on your *Content Staging* environment:
+
+	define( 'CONTENT_STAGING_SECRET_KEY', '_SAME_RANDOM_KEY_ON_BOTH_ENVIRONMENTS_' );
+	define( 'CONTENT_STAGING_ENDPOINT', 'https://www.YOUR-PRODUCTION-SITE.com' );
+	define( 'CONTENT_STAGING_TRANSFER_TIMEOUT', 60 );
+
+Add the following to your config file on your *Production* environment:
+
+	define( 'CONTENT_STAGING_SECRET_KEY', '_SAME_RANDOM_KEY_ON_BOTH_ENVIRONMENTS_' );
+	define( 'CONTENT_STAGING_ENDPOINT', 'https://www.YOUR-CONTENT-STAGE.com' );
+
+*Important!* Make sure to add these configuration values *before* any *require* statements, e.g. before:
+
+	require_once( ABSPATH . 'wp-settings.php' );
 
 Deploy Process
 --------------
@@ -43,16 +64,20 @@ Hooks
 
 Many of the hooks follow a naming schema that indicates at what point in the deployment process they are triggered:
 
-| Environment   | When              | Hook Prefix  |
-| ------------- | ----------------- | ------------ |
-| Content Stage | Before pre-flight | sme_prepare  |
-| Production    | During pre-flight | sme_verify   |
-| Production    | After pre-flight  | sme_verified |
-| Content Stage | After pre-flight  | sme_prepared |
-| Content Stage | Before deploy     | sme_deploy   |
-| Production    | During deploy     | sme_import   |
-| Production    | After deploy      | sme_imported |
-| Content Stage | After deploy      | sme_deployed |
+| Environment   | When                      | Hook Prefix     |
+| ------------- | ------------------------- | --------------- |
+| Content Stage | Before batch is populated | sme_prepare     |
+| Content Stage | After batch is populated  | sme_prepared    |
+| Content Stage | Before pre-flight         | sme_preflight   |
+| Production    | During pre-flight         | sme_store       |
+| Production    | During pre-flight         | sme_verify      |
+| Production    | After pre-flight          | sme_verified    |
+| Content Stage | After pre-flight          | sme_preflighted |
+| Content Stage | Before deploy             | sme_deploy      |
+| Content Stage | During deploy             | sme_deploying   |
+| Production    | During deploy             | sme_import      |
+| Production    | After deploy              | sme_imported    |
+| Content Stage | After deploy              | sme_deployed    |
 
 For a complete list of hooks, search the content-staging directory for *do_action* and *apply_filters*.
 
@@ -98,11 +123,13 @@ During pre-flight you might want to pass messages from the production environmen
 	 */
 	function my_custom_image_data( $batch ) {
 
-		// Instantiate an instance of the content staging API (common functionality).
-		$api = \Me\Stenberg\Content\Staging\Helper_Factory::get_instance()->get_api( 'Common' );
+		/**
+         * @var Common_API $sme_content_staging_api
+         */
+         global $sme_content_staging_api;
 
 		// Add a message to the batch.
-		$api->add_preflight_message( $batch->get_id(), 'This rocks!', 'success' );
+		$sme_content_staging_api->add_preflight_message( $batch->get_id(), 'This rocks!', 'success' );
 	}
 
 	// Here we use a hook that is triggered in the end of the pre-flight (on production).
@@ -115,14 +142,16 @@ The same thing is possible when deploying content. In addition you can also fail
 	 */
 	function my_custom_image_data( $batch ) {
 
-		// Instantiate an instance of the content staging API (common functionality).
-		$api = \Me\Stenberg\Content\Staging\Helper_Factory::get_instance()->get_api( 'Common' );
+        /**
+         * @var Common_API $sme_content_staging_api
+         */
+         global $sme_content_staging_api;
 
 		// Add a message to the batch.
-		$api->add_deploy_message( $batch->get_id(), 'Oh no, something went wrong!', 'error' );
+		$sme_content_staging_api->add_deploy_message( $batch->get_id(), 'Oh no, something went wrong!', 'error' );
 
 		// Mark batch as failed (2 = Fail).
-		$api->set_deploy_status( $batch->get_id(), 2 );
+		$sme_content_staging_api->set_deploy_status( $batch->get_id(), 2 );
 	}
 
 	// This time we use a hook that is triggered in the end of the deploy process (on production).
