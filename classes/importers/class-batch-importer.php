@@ -333,6 +333,8 @@ abstract class Batch_Importer {
 					$val = $meta[$i]['meta_value'];
 				}
 
+				$this->api->add_deploy_message( $this->batch->get_id(), $val, 'warning' );
+
 				// Post ID this meta value is referring to.
 				$referenced_post_id = $this->post_dao->get_id_by_guid( $val );
 
