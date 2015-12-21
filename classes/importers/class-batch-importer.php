@@ -325,11 +325,12 @@ abstract class Batch_Importer {
 
 				// HACK: Maybe not a hack. Support for Advanced Custom Fields cropped images. This assumes the image
 				// ids are the same. TODO ... make this a filterable function?
-				if ( strpos( $meta[$i]['meta_value'], 'original_image' ) !== false ) {
+				$is_acf = ( strpos( $meta[$i]['meta_value'], 'original_image' ) !== FALSE ) ? true : false;
+				if ( $is_acf ) {
 					$arr = json_decode( $meta[$i]['meta_value'] );
 					$referenced_post_id = $arr['original_image'];
 				}
-				
+
 				// Post ID this meta value is referring to.
 				$referenced_post_id = $this->post_dao->get_id_by_guid( $meta[$i]['meta_value'] );
 
@@ -350,6 +351,9 @@ abstract class Batch_Importer {
 
 					$this->api->add_deploy_message( $this->batch->get_id(), $message, 'warning' );
 				}
+
+				// HACK: Fix this now for ACF
+				$referenced_post_id = json_encode( [ 'original_image' => $referenced_post_id, 'cropped_image' => $referenced_post_id ] );
 
 				// Update meta value to point at the post ID on production.
 				$meta[$i]['meta_value'] = $referenced_post_id;
