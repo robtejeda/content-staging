@@ -214,6 +214,11 @@ abstract class Batch_Importer {
 			$post_diff->set_parent_guid( $post->get_parent()->get_guid() );
 		}
 
+		// Mutate the post object to include the proper author ID
+		// TODO: Properly document
+		$user = $this->user_dao->get_user_by_user_login( $post->get_author() );
+		$post->set_author( $user->get_id() );
+
 		/*
 		 * Check if post already exist on production, if it does then update the
 		 * old version of the post rather then creating a new post.

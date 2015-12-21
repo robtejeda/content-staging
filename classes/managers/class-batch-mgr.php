@@ -187,6 +187,11 @@ class Batch_Mgr {
 
 		$post->set_meta( $this->postmeta_dao->get_postmetas_by_post_id( $post->get_id() ) );
 
+		// Change the user to their login name
+		// TODO: Better document
+		$user = $this->user_dao->find( $post->get_author() );
+		$post->set_author( $user->get_login() );
+
 		/*
 		 * Make it possible for third-party developers to modify post before it
 		 * is added to batch.
