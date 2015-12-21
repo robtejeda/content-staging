@@ -297,7 +297,18 @@ class Batch_Mgr {
 		}
 
 		// Find post the current post holds a reference to.
-		$post = $this->post_dao->find( $postmeta['meta_value'] );
+
+		// HACK: Check to see if we are dealing with ACF. If so, we need to change the meta value
+		// slightly. Ideally this could be done via a filter but I don't have time.
+		$val = $postmeta['meta_value'];
+
+		$is_acf = ( strpos( $val, 'original_image' ) !== FALSE ) ? true : false;
+		if ( $is_acf ) {
+			$data = json_decode( $val );
+			$val = $data->original_image;
+		}
+
+		$post = $this->post_dao->find( $val );
 
 		if ( isset( $post ) && $post->get_id() !== null ) {
 			$this->add_post( $batch, $post );
@@ -306,7 +317,12 @@ class Batch_Mgr {
 			 * Change meta value to post GUID instead of post ID so we can later find
 			 * the reference on production.
 			 */
-			$postmeta['meta_value'] = $post->get_guid();
+			if ( $is_acf ) {
+				$postmeta['meta_value'] = json_encode([ 'original_image' => $post->get_guid(), 'cropped_image' => $post->get_guid() ]);
+			} else {
+				$postmeta['meta_value'] = $post->get_guid();
+			}
+			
 		}
 
 		return $postmeta;

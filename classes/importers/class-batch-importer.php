@@ -356,7 +356,11 @@ abstract class Batch_Importer {
 				}
 
 				// Update meta value to point at the post ID on production.
-				$meta[$i]['meta_value'] = $referenced_post_id;
+				if ( $is_acf ) {
+					$meta[$i]['meta_value'] = json_encode( ['original_image' => $referenced_post_id, 'cropped_image' => $referenced_post_id] );
+				} else {
+					$meta[$i]['meta_value'] = $referenced_post_id;
+				}
 			}
 		}
 
