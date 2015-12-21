@@ -89,7 +89,6 @@ class Post_Taxonomy_DAO extends DAO {
 	 */
 	protected function do_insert( Model $obj ) {
 		$data   = $this->create_array( $obj );
-		die($data);
 		$format = $this->format();
 		$this->wpdb->insert( $this->get_table(), $data, $format );
 	}
