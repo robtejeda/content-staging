@@ -129,7 +129,7 @@ class Content_Staging {
 
 		// Determine plugin URL and plugin path of this plugin.
 		$plugin_path = dirname( __FILE__ );
-		$plugin_url  = plugins_url_special( basename( $plugin_path ), $plugin_path );
+		$plugin_url  = plugins_url( basename( $plugin_path ), $plugin_path );
 
 		// Include add-ons.
 		if ( $handle = @opendir( $plugin_path . '/addons' ) ) {
