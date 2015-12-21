@@ -323,6 +323,13 @@ abstract class Batch_Importer {
 			// TODO Remove check for "master"
 			if ( in_array( $meta[$i]['meta_key'], $keys ) && ! empty( $meta[$i]['meta_value'] ) && $meta[$i]['meta_value'] !== 'master' ) {
 
+				// HACK: Maybe not a hack. Support for Advanced Custom Fields cropped images. This assumes the image
+				// ids are the same. TODO ... make this a filterable function?
+				if ( strpos( $meta[$i]['meta_value'], 'original_image' ) !== false ) {
+					$arr = json_decode( $meta[$i]['meta_value'] );
+					$referenced_post_id = $arr['original_image'];
+				}
+				
 				// Post ID this meta value is referring to.
 				$referenced_post_id = $this->post_dao->get_id_by_guid( $meta[$i]['meta_value'] );
 
