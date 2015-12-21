@@ -297,7 +297,6 @@ class Batch_Mgr {
 		}
 
 		// Find post the current post holds a reference to.
-		var_dump( $batch->get_post_rel_keys() );
 
 		// Start of supporting filters here... TODO
 		$value = apply_filters( 'sme_post_relationship_value_deconstruct', [ $postmeta['meta_value'] ] );

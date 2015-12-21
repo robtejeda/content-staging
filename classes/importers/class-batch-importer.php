@@ -326,9 +326,9 @@ abstract class Batch_Importer {
 				// Start of supporting filters here... TODO
 				$meta_value = apply_filters( 'sme_post_relationship_value_deconstruct', [ $meta[$i]['meta_value'] ] );
 
-				for ( $i = 0; $i < count( $meta_value ); $i++ ) {
+				for ( $j = 0; $j < count( $meta_value ); $j++ ) {
 					// Post ID this meta value is referring to.
-					$referenced_post_id = $this->post_dao->get_id_by_guid( $val );
+					$referenced_post_id = $this->post_dao->get_id_by_guid( $meta_value[$j] );
 
 					// Referenced post could not be found.
 					if ( ! $referenced_post_id ) {
@@ -349,7 +349,7 @@ abstract class Batch_Importer {
 					}
 
 					// Replace the value in our meta value array
-					$meta_value[$i] = $referenced_post_id;
+					$meta_value[$j] = $referenced_post_id;
 				}
 
 				// Start of supporting filters here... TODO
