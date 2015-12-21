@@ -90,8 +90,9 @@ class Post_Taxonomy_DAO extends DAO {
 	protected function do_insert( Model $obj ) {
 		$data   = $this->create_array( $obj );
 		$format = $this->format();
-		return $this->wpdb->insert( $this->get_table(), $data, $format );
+		$this->wpdb->insert( $this->get_table(), $data, $format );
 
+		return $this->wpdb->last_error;
 		return $data;
 
 		// TODO: Why does the above not work?
