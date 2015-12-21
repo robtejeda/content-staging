@@ -93,7 +93,7 @@ class Post_Taxonomy_DAO extends DAO {
 		//$this->wpdb->insert( $this->get_table(), $data, $format );
 
 		// TODO: Why does the above not work?
-		wp_set_object_terms( $obj->get_post()->get_id(), $obj->get_taxonomy()->get_term()->get_slug(), $obj->get_taxonomy()->get_taxonomy(), true );
+		return wp_set_object_terms( $obj->get_post()->get_id(), $obj->get_taxonomy()->get_term()->get_slug(), $obj->get_taxonomy()->get_taxonomy(), true );
 	}
 
 	/**

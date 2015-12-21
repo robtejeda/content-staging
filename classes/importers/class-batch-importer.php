@@ -268,9 +268,9 @@ abstract class Batch_Importer {
 		foreach ( $post->get_post_taxonomy_relationships() as $post_taxonomy ) {
 			// Import taxonomy.
 			$this->import_taxonomy( $post_taxonomy->get_taxonomy() );
-			$this->post_taxonomy_dao->insert( $post_taxonomy );
+			$result = $this->post_taxonomy_dao->insert( $post_taxonomy );
 
-			$this->api->add_deploy_message( $this->batch->get_id(), $post_taxonomy->get_taxonomy()->get_taxonomy() . ' / ' . $post_taxonomy->get_taxonomy()->get_term()->get_slug() . '/' . $post_taxonomy->get_post()->get_id(), 'error' );
+			$this->api->add_deploy_message( $this->batch->get_id(), var_export($result, true), 'error' );
 		}
 
 		// Notify listeners that post has been imported.
