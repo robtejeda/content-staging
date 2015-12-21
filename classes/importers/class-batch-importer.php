@@ -265,7 +265,7 @@ abstract class Batch_Importer {
 			$this->import_taxonomy( $post_taxonomy->get_taxonomy() );
 			$this->post_taxonomy_dao->insert( $post_taxonomy );
 
-			$this->api->add_deploy_message( $this->batch->get_id(), $post_taxonomy->get_taxonomy()->get_id(), 'error' );
+			$this->api->add_deploy_message( $this->batch->get_id(), $post_taxonomy->get_taxonomy()->get_term()->get_name() . ' ' . $post_taxonomy->get_taxonomy()->get_id(), 'error' );
 		}
 
 		// Notify listeners that post has been imported.
