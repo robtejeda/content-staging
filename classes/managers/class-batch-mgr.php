@@ -320,8 +320,6 @@ class Batch_Mgr {
 			}
 		}
 
-		var_dump($value);
-		
 		// Start of supporting filters here... TODO
 		$value = apply_filters( 'sme_post_relationship_value_reconstruct', $value );
 		$postmeta['meta_value'] = $value;
