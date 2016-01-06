@@ -316,10 +316,12 @@ class Batch_Mgr {
 				 * Change meta value to post GUID instead of post ID so we can later find
 				 * the reference on production.
 				 */
-				//$value[$i] = $post->get_guid();
+				$value[$i] = $post->get_guid();
 			}
 		}
 
+		var_dump($value);
+		
 		// Start of supporting filters here... TODO
 		$value = apply_filters( 'sme_post_relationship_value_reconstruct', $value );
 		$postmeta['meta_value'] = $value;
