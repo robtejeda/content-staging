@@ -348,7 +348,7 @@ abstract class Batch_Importer {
 						$message .= '<li>GUID referenced post: %s</li>';
 						$message .= '</ul>';
 
-						$message = sprintf( $message, get_current_blog_id(), $stage_id, $prod_id, $meta[$i]['meta_key'], $meta[$i]['meta_value'] );
+						$message = sprintf( $message, get_current_blog_id(), $stage_id, $prod_id, $meta[$i]['meta_key'], $meta_value[$j] );
 
 						$this->api->add_deploy_message( $this->batch->get_id(), $message, 'warning' );
 					}
