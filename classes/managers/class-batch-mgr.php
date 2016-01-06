@@ -309,9 +309,6 @@ class Batch_Mgr {
 		for ( $i = 0; $i < count( $value ); $i++ ) {
 			$post = $this->post_dao->find( $value[$i] );
 
-			var_dump($post);
-			die();
-
 			if ( isset( $post ) && $post->get_id() !== null ) {
 				$this->add_post( $batch, $post );
 
@@ -319,7 +316,7 @@ class Batch_Mgr {
 				 * Change meta value to post GUID instead of post ID so we can later find
 				 * the reference on production.
 				 */
-				$value[$i] = $post->get_guid();
+				//$value[$i] = $post->get_guid();
 			}
 		}
 
