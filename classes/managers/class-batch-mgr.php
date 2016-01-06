@@ -309,6 +309,9 @@ class Batch_Mgr {
 		for ( $i = 0; $i < count( $value ); $i++ ) {
 			$post = $this->post_dao->find( $value[$i] );
 
+			var_dump($post);
+			die();
+
 			if ( isset( $post ) && $post->get_id() !== null ) {
 				$this->add_post( $batch, $post );
 
