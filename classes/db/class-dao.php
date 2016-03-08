@@ -243,6 +243,10 @@ abstract class DAO {
 				$where .= 'post_status = %s';
 				$values[] = $statuses[$i];
 			}
+
+			// TODO: is this the best way?
+			$where .= " OR (post_status = 'inherit' AND post_type = 'attachment')";
+
 			$where .= ')';
 		}
 		return $where;
