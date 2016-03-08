@@ -54,6 +54,9 @@ class Post_Table extends WP_List_Table {
 			case 'post_title':
 				$value = $this->column_title( $post );
 				break;
+			case 'post_type':
+				$value = $this->column_type( $post );
+				break;
 			case 'post_modified':
 				$value = call_user_func( array( $post, 'get_modified' ) );
 				break;
@@ -71,6 +74,20 @@ class Post_Table extends WP_List_Table {
 			$parents = $this->get_parent_title( $post->get_parent(), $parents );
 		}
 
+		// TODO: I hate that this is here... can I move it somewhere more general? Maybe in the model?
+		
+		$post_id = null;
+		$post_title = null;
+
+		if ($post->get_type() == 'nav_menu_item' && empty($post->get_title())) {
+			$actual_post = get_post(get_post_meta($post->get_id(), '_menu_item_object_id', true));
+			$post_title = $actual_post->post_title;
+			$post_id = $actual_post->ID;
+		} else {
+			$post_title = $post->get_title();
+			$post_id = $post->get_id();
+		}
+
 		return sprintf(
 			'%s<strong><span class="row-title"><a href="%s" target="_blank">%s</a></span></strong>',
 			$parents,
@@ -84,7 +101,18 @@ class Post_Table extends WP_List_Table {
 		if ( $post->get_parent() !== null ) {
 			$content = $this->get_parent_title( $post->get_parent(), $content );
 		}
+
 		return $content;
+	}
+
+	public function column_type( Post $post ) {
+		$post_type = get_post_type_object( $post->get_type() );
+		$type = (is_object($post_type)) ? $post_type->label : $post->get_type();
+
+		return sprintf(
+			'<span class="row-type">%s</span>',
+			$type
+		);
 	}
 
 	/**
@@ -147,6 +175,12 @@ class Post_Table extends WP_List_Table {
 				'title'      => 'Post Title',
 				'sortable'   => true,
 				'sort_by'    => 'post_title',
+				'pre_sorted' => false,
+			),
+			'post_type' => array(
+				'title'      => 'Post Type',
+				'sortable'   => true,
+				'sort_by'    => 'post_type',
 				'pre_sorted' => false,
 			),
 			'post_modified' => array(

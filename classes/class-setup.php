@@ -130,6 +130,16 @@ class Setup {
 			$meta_keys[] = '_thumbnail_id';
 		}
 
+		// Add in relationship for menu item parent
+		if ( ! in_array( '_menu_item_menu_item_parent', $meta_keys ) ) {
+			$meta_keys[] = '_menu_item_menu_item_parent';
+		}
+
+		// Add in relationship for menu item 
+		if ( ! in_array( '_menu_item_object_id', $meta_keys ) ) {
+			$meta_keys[] = '_menu_item_object_id';
+		}
+
 		return $meta_keys;
 	}
 
