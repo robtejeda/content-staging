@@ -51,8 +51,8 @@ Add the following to your config file on your *Production* environment:
 
 Add the following lines to wp-config file so CS can swap absolute paths once pushed to PRD.
 
-define('STG_PATH', 'stg.wordpress');
-define('PRD_PATH', 'local.wordpress');
+	define('STG_PATH', 'stg.wordpress');
+	define('PRD_PATH', 'local.wordpress');
 
 Deploy Process
 --------------
