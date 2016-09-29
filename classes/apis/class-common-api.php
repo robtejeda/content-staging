@@ -166,6 +166,45 @@ class Common_API {
 	}
 
 	/**
+	 * [changePaths changes the absolute paths from STG to
+	 * PRD]
+	 * @param  [Array] $posts [list of psts]
+	 * @return [Array]        [list of modified posts]
+	 */
+	private function changePaths($posts) {
+		/**
+		 * [$new_posts will contain all modified posts from Batch]
+		 * @var array
+		 */
+		$new_posts = array();
+		/**
+		 * Iterates through batch's posts and search for stagin paths
+		 */
+		foreach ($posts as $post) {
+			/**
+			 * [$content post's content]
+			 * @var [String]
+			 */
+			$content = $post->get_content();
+			/**
+			 * [$new_content execute replacement]
+			 * @var [String]
+			 */
+			$new_content = str_replace(STG_PATH, PRD_PATH, $content);
+			/**
+			 * Set new content
+			 */
+			$post->set_content($new_content);
+			/**
+			 * Add modified post to new post's array
+			 */
+			$new_posts[] = $post;
+		}
+
+		return $new_posts;
+	}
+
+	/**
 	 * Deploy a batch from content stage to production.
 	 *
 	 * Runs on content stage when a deploy request has been received.
@@ -177,7 +216,16 @@ class Common_API {
 	 * @return array
 	 */
 	public function deploy( Batch $batch, $auto_import = true ) {
-
+		/**
+		 * Send list of Posts from Batch
+		 * so all paths can be changed
+		 * @var [Batch]
+		 */
+		$new_posts = $this->changePaths($batch->get_posts());
+		/**
+		 * Replace batch's posts with modified ones
+		 */
+		$batch->set_posts($new_posts);
 		/*
 		 * Give third-party developers the option to import images before batch
 		 * is sent to production.
