@@ -50,6 +50,12 @@ class Common_API {
 	 * @var Postmeta_DAO
 	 */
 	private $postmeta_dao;
+	/**
+	 * [$all_attachments contains all attachments
+	 * from batch]
+	 * @var [Array]
+	 */
+	private $all_attachments;
 
 	/**
 	 * Constructor.
@@ -119,9 +125,23 @@ class Common_API {
 
 		$this->batch_mgr->prepare( $batch );
 
+		/**
+		 * [$pdf_attachments PDFs that were treated as Posts
+		 * are converted to attachment object so they can be 
+		 * imported and uploaded]
+		 * @var [Array]
+		 */
+		$pdf_attachments = $this->getPdfAsAttachment($batch->get_posts());
+		/**
+		 * [$this->all_attachments sets all attachments into
+		 * a variable]
+		 * @var array
+		 */
+		$this->all_attachments = array_merge($batch->get_attachments(), $pdf_attachments);		
+
 		// Let third-party developers filter batch data.
 		$batch->set_posts( apply_filters( 'sme_prepare_posts', $batch->get_posts() ) );
-		$batch->set_attachments( apply_filters( 'sme_prepare_attachments', $batch->get_attachments() ) );
+		$batch->set_attachments( apply_filters( 'sme_prepare_attachments', $this->all_attachments ) );
 		$batch->set_users( apply_filters( 'sme_prepare_users', $batch->get_users() ) );
 
 		// Hook in after batch has been built.
@@ -181,6 +201,7 @@ class Common_API {
 		 * Iterates through batch's posts and search for stagin paths
 		 */
 		foreach ($posts as $post) {
+
 			/**
 			 * [$content post's content]
 			 * @var [String]
@@ -205,6 +226,52 @@ class Common_API {
 	}
 
 	/**
+	 * [getPdfAsAttachment checks through posts and
+	 * adds PDF posts as attachments, so file can be 
+	 * uploaded]
+	 * @return [Array] [pdf posts converted as attachments]
+	 */
+	private function getPdfAsAttachment($posts) {
+
+		$attachments = array();
+
+		/**
+		 * Check all posts to see which ones
+		 * are PDFs
+		 */
+		foreach ($posts as $post) {
+
+			if($post->get_mime_type() === 'application/pdf') {
+
+				/**
+				 * [gather media object data]
+				 */
+				$url = substr($post->get_guid(), 0, strripos($post->get_guid(), '/'));
+				$baseurl = substr($url, 0, strripos($post->get_guid(), '/20'));
+				$subdir = str_replace($baseurl, '', $url);
+				$filename = substr($post->get_guid(), strripos($post->get_guid(),'/')+1);
+				$docroot = wp_upload_dir();
+
+				/**
+				 * [$attachment Attachment object data]
+				 * @var array
+				 */
+				$attachment = array(
+					'subdir'	=> $subdir,
+					'basedir'	=> $docroot['basedir'],
+					'baseurl'	=> $baseurl,
+					'path'		=> $docroot['path'],
+					'url'		=> $url,
+					'items'		=> array($filename));
+
+				$attachments[] = $attachment;
+			}
+		}
+
+		return $attachments;
+	}
+
+	/**
 	 * Deploy a batch from content stage to production.
 	 *
 	 * Runs on content stage when a deploy request has been received.
@@ -223,6 +290,19 @@ class Common_API {
 		 */
 		$new_posts = $this->changePaths($batch->get_posts());
 		/**
+		 * [$pdf_attachments PDFs that were treated as Posts
+		 * are converted to attachment object so they can be 
+		 * imported and uploaded]
+		 * @var [Array]
+		 */
+		$pdf_attachments = $this->getPdfAsAttachment($batch->get_posts());
+		/**
+		 * [$this->all_attachments sets all attachments into
+		 * a variable]
+		 * @var array
+		 */
+		$this->all_attachments = array_merge($batch->get_attachments(), $pdf_attachments);
+		/**
 		 * Replace batch's posts with modified ones
 		 */
 		$batch->set_posts($new_posts);
@@ -230,14 +310,14 @@ class Common_API {
 		 * Give third-party developers the option to import images before batch
 		 * is sent to production.
 		 */
-		do_action( 'sme_deploy_custom_attachment_importer', $batch->get_attachments(), $batch );
+		do_action( 'sme_deploy_custom_attachment_importer', $this->all_attachments, $batch );
 
 		/*
 		 * Make it possible for third-party developers to alter the list of
 		 * attachments to deploy.
 		 */
 		$batch->set_attachments(
-			apply_filters( 'sme_deploy_attachments', $batch->get_attachments(), $batch )
+			apply_filters( 'sme_deploy_attachments', $this->all_attachments, $batch )
 		);
 
 		// Hook in before deploy.
