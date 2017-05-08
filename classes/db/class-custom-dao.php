@@ -39,7 +39,7 @@ class Custom_DAO {
 
 		foreach ( $result as $row ) {
 			if ( is_serialized( $row ) ) {
-				$row = unserialize( $row );
+				@$row = unserialize( $row );
 			}
 
 			if ( is_array( $row ) ) {

@@ -304,7 +304,7 @@ class Batch_Mgr {
 		// Find post the current post holds a reference to.
 
 		// Start of supporting filters here... TODO
-		$value = apply_filters( 'sme_post_relationship_value_deconstruct', [ $postmeta['meta_value'] ] );
+		$value = apply_filters( 'sme_post_relationship_value_deconstruct', array($postmeta['meta_value']) );
 
 		for ( $i = 0; $i < count( $value ); $i++ ) {
 			$post = $this->post_dao->find( $value[$i] );

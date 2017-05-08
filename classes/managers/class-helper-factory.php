@@ -18,7 +18,8 @@ class Helper_Factory {
 	}
 
 	public static function get_instance() {
-		if ( empty( self::$instance ) ) {
+		$instance = self::$instance;
+		if ( empty( $instance ) ) {
 			global $wpdb;
 			self::$instance = new Helper_Factory( $wpdb );
 		}

@@ -326,10 +326,11 @@ abstract class Batch_Importer {
 			$meta[$i]['post_id'] = $prod_id;
 
 			// TODO Remove check for "master"
-			if ( in_array( $meta[$i]['meta_key'], $keys ) && ! empty( $meta[$i]['meta_value'] ) && $meta[$i]['meta_value'] !== 'master' ) {
+			$meta_value = $meta[$i]['meta_value'];
+			if ( in_array( $meta[$i]['meta_key'], $keys ) && ! empty( $meta_value ) && $meta[$i]['meta_value'] !== 'master' ) {
 
 				// Start of supporting filters here... TODO
-				$meta_value = apply_filters( 'sme_post_relationship_value_deconstruct', [ $meta[$i]['meta_value'] ] );
+				$meta_value = apply_filters( 'sme_post_relationship_value_deconstruct', array($meta[$i]['meta_value']) );
 
 				for ( $j = 0; $j < count( $meta_value ); $j++ ) {
 					// Post ID this meta value is referring to.

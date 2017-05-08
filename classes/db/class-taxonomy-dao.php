@@ -317,7 +317,8 @@ class Taxonomy_DAO extends DAO {
 					 */
 					unset( $hierarchy[$term_key][$index] );
 
-					if ( empty( $hierarchy[$term_key] ) ) {
+					$value = $hierarchy[$term_key];
+					if ( empty( $value ) ) {
 						// No term children exist anymore, remove this parent term from hierarchy.
 						unset( $hierarchy[$term_key] );
 					}

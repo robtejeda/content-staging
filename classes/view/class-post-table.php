@@ -77,9 +77,9 @@ class Post_Table extends WP_List_Table {
 		// TODO: I hate that this is here... can I move it somewhere more general? Maybe in the model?
 		
 		$post_id = null;
-		$post_title = null;
+		$post_title = $post->get_title();
 
-		if ($post->get_type() == 'nav_menu_item' && empty($post->get_title())) {
+		if ($post->get_type() == 'nav_menu_item' && empty($post_title)) {
 			$actual_post = get_post(get_post_meta($post->get_id(), '_menu_item_object_id', true));
 			$post_title = $actual_post->post_title;
 			$post_id = $actual_post->ID;

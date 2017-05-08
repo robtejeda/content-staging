@@ -208,6 +208,35 @@ class Common_API {
 			 */
 			$content = $post->get_content();
 			/**
+			 * [$meta get post meta data object]
+			 * @var [Object]
+			 */
+			$meta = $post->get_meta();
+			/**
+			 * [$new_meta metadata with modified path]
+			 * @var array
+			 */
+			$new_meta = array();
+			/**
+			 * Check all meta array to look for AVIA 
+			 * data (the one used by Enfold Layout Builder)
+			 */
+			foreach ($meta as $item) {
+
+				if($item['meta_key'] == '_aviaLayoutBuilderCleanData') {
+					/**
+					 * Execute path change function
+					 */
+					$item['meta_value'] = str_replace(STG_PATH, PRD_PATH, $item['meta_value']);
+				}
+				/**
+				 * Store modified meta into new array
+				 */
+				$new_meta[] = $item;
+			}
+
+			$post->set_meta($new_meta);
+			/**
 			 * [$new_content execute replacement]
 			 * @var [String]
 			 */
@@ -319,6 +348,10 @@ class Common_API {
 		$batch->set_attachments(
 			apply_filters( 'sme_deploy_attachments', $this->all_attachments, $batch )
 		);
+
+		// echo "<pre>";
+		// var_dump($batch->get_posts());
+		// echo "</pre>";
 
 		// Hook in before deploy.
 		do_action( 'sme_deploy', $batch );
