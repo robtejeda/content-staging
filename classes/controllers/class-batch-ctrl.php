@@ -315,9 +315,7 @@ class Batch_Ctrl {
 		// Get referring URL.
 		$url = $_POST['_wp_http_referer'];
 
-		$batches = $_POST['batches'];
-		
-		if ( isset( $_POST['batches'] ) && ! empty( $batches ) ) {
+		if ( isset( $_POST['batches'] ) && ! empty( $_POST['batches'] ) ) {
 			$batches = array_map( 'intval', $_POST['batches'] );
 
 			// Delete batches.

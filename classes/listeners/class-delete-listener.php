@@ -145,14 +145,11 @@ class Delete_Listener {
 	 */
 	public function prepare( Batch $batch ) {
 
-
 		if ( ! isset( $_POST['delete_posts'] ) || empty( $_POST['delete_posts'] ) ) {
 			$batch->add_custom_data( $this->extension, array() );
 			return;
 		}
 
-		$deleted_posts = $_POST['delete_posts'];
-		
 		// Posts selected for deletion.
 		$selected = array_map( 'intval', $_POST['delete_posts'] );
 
@@ -251,9 +248,7 @@ class Delete_Listener {
 		preg_match( $regex, $message->get_message(), $groups );
 
 		// Make sure groups has been set.
-		$groups_1 = $groups[1];
-		$groups_2 = $groups[2];
-		if ( empty( $groups_1 ) || empty( $groups_2 ) ) {
+		if ( empty( $groups[1] ) || empty( $groups[2] ) ) {
 			return;
 		}
 
